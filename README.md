@@ -17,12 +17,12 @@ In flash store current state and previous state.
 
 Hit the undo and it display previous state.  If last state empty, do nothing.
 
-* ToDo
+# ToDo
 - Fix TimeZome
 - Do not keep incrementing the day of the week on "Taken" press
 - Add check to make sure sleep_memory is correctly initiallized
 
-* Lib
+# Lib
 I copied another project, si I probably do not need this all.  Will need to fix it.
 
 - adafruit_bitmap_font
