@@ -17,11 +17,11 @@ In flash store current state and previous state.
 Hit the undo and it display previous state.  If last state empty, do nothing.
 
 # ToDo
-- Fix TimeZome - done
-   Added both a tz offset andm tz name to secrets.py.  circuit python does not have pytz.
+- Fix TimeZome - done  
+  Added both a tz offset andm tz name to secrets.py.  circuit python does not have pytz.
 - Do not keep incrementing the day of the week on "Taken" press - done  
   use datatime.weekday() function
-- Add check to make sure sleep_memory is correctly initiallized - done
+- Add check to make sure sleep_memory is correctly initiallized - done  
   Call nexttoken if sleep_memory is not initialized
  
 # Lib
