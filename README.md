@@ -9,7 +9,6 @@ I could 3d print a holder with spots to hold 2 syringes per day for mon-sun. But
 Simple diplay: Next dose MONTH DAY {AM|PM}
 - button 1: took dose - For the PM will advance to next day.  If pressed multiple times will do nothing.  For AM. will just change PM instead of AM.
 - button 2: undo - reverts to previous state.
-- button 3: refresh - redisplay current state.
 
 On power up if current state is not set will display AM message for the day. Otherwise will display current state.
 
@@ -18,10 +17,13 @@ In flash store current state and previous state.
 Hit the undo and it display previous state.  If last state empty, do nothing.
 
 # ToDo
-- Fix TimeZome
-- Do not keep incrementing the day of the week on "Taken" press
-- Add check to make sure sleep_memory is correctly initiallized
-
+- Fix TimeZome - done
+   Added both a tz offset andm tz name to secrets.py.  circuit python does not have pytz.
+- Do not keep incrementing the day of the week on "Taken" press - done  
+  use datatime.weekday() function
+- Add check to make sure sleep_memory is correctly initiallized - done
+  Call nexttoken if sleep_memory is not initialized
+ 
 # Lib
 I copied another project, si I probably do not need this all.  Will need to fix it.
 

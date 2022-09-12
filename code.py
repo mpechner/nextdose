@@ -7,7 +7,7 @@ import json
 from adafruit_magtag.magtag import MagTag
 from secrets import secrets
 from time import sleep
-from adafruit_datetime import datetime, timedelta
+from adafruit_datetime import datetime, timedelta, timezone
 from gc import collect
 import alarm
 from adafruit_portalbase import PortalBase
@@ -44,8 +44,12 @@ def get_cur_time():
     wifi.radio.connect(secrets["ssid"], secrets["password"])
 
     pool = socketpool.SocketPool(wifi.radio)
-    ntp = adafruit_ntp.NTP(pool, tz_offset=0)
-    return ntp
+    ntp = adafruit_ntp.NTP(pool, tz_offset=int(secrets["tzoff"]))
+    newtime = ntp.datetime
+
+    curtime = datetime(newtime.tm_year, newtime.tm_mon, newtime.tm_mday, newtime.tm_hour, newtime.tm_min, newtime.tm_sec, tzinfo=timezone(timedelta(hours=int(secrets["tzoff"])), secrets['tz']))
+    print(curtime.tzinfo)
+    return curtime
 
 def deep_sleep():
     last_line = " Taken                     Undo"
@@ -99,16 +103,16 @@ def print_message(doCurrent):
 def next_dose():
 
     curtime = get_cur_time()
-    newtime = curtime.datetime
+
 
     # initialize  sleep_memory
     if alarm.sleep_memory[1] < 1 or alarm.sleep_memory[1] > 31:
         print("set initial time")
         alarm.sleep_memory[0] = 1
-        if newtime.tm_hour > 2:
+        if curtime.hour > 2:
             alarm.sleep_memory[0] = 0
-        alarm.sleep_memory[1] = newtime.tm_mday
-        alarm.sleep_memory[2] = newtime.tm_wday
+        alarm.sleep_memory[1] = curtime.day
+        alarm.sleep_memory[2] = curtime.weekday()
         alarm.sleep_memory[3] = 0
         alarm.sleep_memory[4] = 0
         alarm.sleep_memory[5] = 0
@@ -123,8 +127,7 @@ def next_dose():
         return
 
     #Flip to next day
-    dt_day = datetime(newtime.tm_year, newtime.tm_mon, newtime.tm_mday, newtime.tm_hour, newtime.tm_min, newtime.tm_sec)
-    nextday = dt_day + timedelta(days = 1)
+    nextday = curtime + timedelta(days = 1)
     print("next day ", type(nextday), nextday)
 
     alarm.sleep_memory[3] = alarm.sleep_memory[0]
@@ -133,7 +136,7 @@ def next_dose():
 
     alarm.sleep_memory[0] = 1
     alarm.sleep_memory[1] = nextday.day
-    alarm.sleep_memory[2] = alarm.sleep_memory[2] + 1
+    alarm.sleep_memory[2] = nextday.weekday()
     if alarm.sleep_memory[2] > 6:
         alarm.sleep_memory[2] = 0
 
@@ -189,5 +192,8 @@ if isinstance(alarm.wake_alarm, alarm.pin.PinAlarm): #PinAlarm
     elif alarm.wake_alarm.pin == board.BUTTON_C:
       undo_dose()
 else:
-    print_message(True)
+    if alarm.sleep_memory[1] == 0:
+        next_dose()
+    else:
+        print_message(True)
 deep_sleep()
